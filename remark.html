@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Software Defined Radio</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        /*font-weight: normal;*/
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+    <script language="javascript" type="text/javascript" src="http://www.flotcharts.org/flot/jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="http://www.flotcharts.org/flot/jquery.flot.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Software Defined Radio
+### Engineering Learning Group
+### 2016-04-22
+### Evan Krall KC9IAE
+
+---
+
+# Agenda
+
+1. What is SDR?
+1. Some quick demos
+1. Radio basics
+1. How does SDR work?
+1. How to get started with SDR
+
+---
+
+# What is Software Defined Radio?
+
+- A software radio peripheral (SRP), sometimes called a "software defined radio", samples radio waves around a certain frequency, digitizes, sends to a computer.
+  - will talk about how these devices work in a bit.
+- Then use software to decode the sampled radio waves.
+- There are very cheap ($10-$30) SRPs called RTL-SDR
+- Can also do this in reverse: use software to generate a digital signal, send to SRP, SRP transmits.
+
+---
+
+# Why?
+
+Same reason we use software for other things: software is more flexible than hardware.
+
+Military, telecommunications infrastructure use SDR for reconfigurability.
+
+---
+class: center, middle
+
+## Some cool things you can do with RTL-SDR devices
+
+---
+
+## Listen to things!
+
+- Broadcast FM, AM, etc.
+- AIS: ships
+- ADS-B: planes
+- Weather satellites
+- Police/Fire radio (not the encrypted stuff.)
+- POCSAG (Pagers).
+
+???
+
+Demos:
+
+- GQRX:
+  - Broadcast FM: ??
+  - Broadcast TV: ??
+  - POCSAG: ??
+- ADS-B
+  - `dump1090 --interactive --net`
+- AIS
+  - `rtl_ais -n`
+  - `OpenCPN`
+
+---
+
+## "Security research"
+
+- Tire Pressure Monitoring System
+- Smart meters
+- Wireless surveillance cameras / baby monitors
+- "Internet of Things"
+- Use rainbow tables to crack GSM encryption, intercept SMSes
+- Unintended radiation
+  - Video cables emit RF which can be captured
+  - Extracting GPG keys from nearby computers
+
+---
+
+## Legality (reception)
+
+**I am not a lawyer.**
+
+A not-at-all comprehensive list of things that can get you into trouble:
+
+- Decrypting encrypted transmissions
+- Publishing intercepted transmissions
+- Profiting from / using the information for commercial gain
+- Using what you hear for the purposes of other crimes
+
+Some things that are okay:
+
+- Anything intended for the general public.
+- Amateur radio / CB / GMRS
+- Marine or aeronautical communication systems
+
+---
+
+## Legality (transmission)
+
+**I am not a lawyer.**
+
+Generally speaking, **transmitting with an SDR is illegal**, unless you have a license for that frequency.
+
+This even applies to "license-free" bands like ISM, CB, MURS, FRS
+&mdash; on these bands, the devices themselves are licensed (certified), and your SDR transmitter is not.
+
+The easiest license to get is an Amateur Radio license
+&mdash; a few dollars and a test, and you get a bunch of different frequencies.
+
+Amateur bands overlap many common ISM bands.
+
+---
+
+- Radio basics
+   - electromagnetic waves
+   - define terms:
+      - amplitude
+      - frequency
+      - phase
+  - basic modulations:
+    - Analog modulations (continuous values)
+      - frequency modulation
+      - amplitude modulation
+  - Relationship between trigonometric and complex exponential
+  - Fourier transform
+    - Define: takes infinitely repeating, continuous time signal, breaks it down into frequency components
+    - Examples: sine wave, square wave, triangle wave
+      - demonstrate how square wave can be constructed of many sine waves
+    - Reversible: inverse fourier transform
+    - DFT: FT can be done in discrete time, on time-limited sections
+      - spectrum analyzers (image: periodogram)
+      - waterfall chart / spectrogram (image: spectrogram, inspectrum, baudline)
+
+---
+
+  - Let's look at our modulations in the frequency domain
+    - FM
+      - oh hey it's a wavy line
+      - kinda looks like our audio.
+      - pretty much what you'd expect.
+      - let's zoom out (take longer FFTs) and explore relationship of audio bandwidth to radio bandwidth
+    - AM
+      - show spectrogram of AM signal
+      - what's going on with those side bands?
+        - show math that explains those, using complex exponentials (TODO: math)
+
+<!--
+    - SSB: a modification of AM
+      - In AM, the carrier contains no/little information
+      - Also, the upper and lower side bands
+      - we're wasting >half of our power on redundant frequencies
+      - Let's just go ahead and cut these out using a high pass filter.
+-->
+  - Heterodyne / frequency shifting
+    - Multiplying two signals produces side bands at the sum and difference of the two frequencies
+    - What if we took an RF signal (from an antenna, perhaps), amplitude modulated it with some nearby frequency?
+    - We'd end up with the original signal, frequency shifted down.
+    - If you shift all the way down to zero, you can demodulate SSB
+    - However, there's a problem: any signal just below your local oscillator frequency also gets shifted down.
+    - The problem is that we can't distinguish negative frequencies from positive frequencies. How do we do that?
+
+---
+
+# Software Radio Peripheral internals
+
+- Tuner (Local oscillator, mixer)
+- ADC
+
+---
+
+## What do the samples look like?
+
+---
+
+# Let's do some SDR already!
+
+---
+
+# GNU Radio
+
+(Originally started to try and get the FCC to not mandate the "broadcast flag" in ATSC)[1]
+
+[1] http://apps.fcc.gov/ecfs/document/view;jsessionid=0Kf2SPvH5VyLmfGmnnLfVhDdYG7Bn5GrQQ2RpynjpS1phMgl7zYp!1357496456!-1864380355?id=6513395349
+
+---
+
+<div id="placeholder" style="width: 100px; height: 100px"></div>
+
+<script language="javascript" type="text/javascript">
+$(function() {
+
+    var d1 = [];
+    for (var i = 0; i < 14; i += 0.5) {
+      d1.push([i, Math.sin(i)]);
+    }
+
+    var d2 = [[0, 3], [4, 8], [8, 5], [9, 13]];
+
+    // A null signifies separate line segments
+
+    var d3 = [[0, 12], [7, 12], null, [7, 2.5], [12, 2.5]];
+
+    $.plot("#placeholder", [ d1, d2, d3 ]);
+
+    // Add the Flot version string to the footer
+
+    // $("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+});
+</script>
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
