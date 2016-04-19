@@ -2,6 +2,26 @@
 
 ## Topics to cover:
 
+- Software defined radio.
+  - What is it?
+    - A software radio peripheral (SRP), sometimes called a "software defined radio", samples radio waves around a certain frequency, digitizes, sends to a computer.
+      - will talk about how these devices work in a bit.
+    - Then use software to decode the sampled radio waves.
+    - There are very cheap ($10-$30) SRPs called RTL-SDR
+    - Can also do this in reverse: use software to generate a digital signal, send to SRP, SRP transmits.
+  - Why?
+    - Same reason we use software for other things: software is more flexible than hardware.
+  - Some cool things you can do with cheap SDRs
+    - Listen to things!
+      - Broadcast FM, AM, etc.
+      - Digital TV broadcast
+      - AIS: ships
+      - ADS-B: planes
+      - Weather satellites
+    - Listen to things you aren't supposed to!
+      - Police/Fire radio (not the encrypted stuff.)
+      - POCSAG Pagers
+
 - Radio basics
   - electromagnetic waves
   - define terms:
