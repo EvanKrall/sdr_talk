@@ -14,6 +14,10 @@
       h1, h2, h3 {
          font-family: 'Yanone Kaffeesatz';
       }
+      .remark-slide-content {
+         padding: 1em 1em 1em 1em;
+      }
+
       .remark-slide-content h1 {
          font-size: 72px;
       }
@@ -65,6 +69,14 @@
          font-size: 25px;
       }
 
+      .fullwidth img {
+         width: 100%;
+      }
+
+      .float-right {
+         float: right;
+         width: 50%;
+      }
     </style>
 <!--     <script language="javascript" type="text/javascript" src="http://www.flotcharts.org/flot/jquery.js"></script>
     <script language="javascript" type="text/javascript" src="http://www.flotcharts.org/flot/jquery.flot.js"></script>
@@ -93,9 +105,10 @@ class: center, middle
 
 # What is Software Defined Radio?
 
-- A software radio peripheral (SRP), sometimes called a "software defined radio", samples radio waves around a certain frequency, digitizes, sends to a computer.
+- A software radio peripheral (SRP), usually just called an SDR, samples radio waves around a certain frequency, digitizes, sends to a computer.
    - will talk about how these devices work in a bit.
-- Then use software to decode the sampled radio waves.
+- Then we can use software to decode the sampled radio waves.
+- On some hardware we can do the reverse, generating signals in software and transmitting them.
 
 ---
 
@@ -114,11 +127,24 @@ class: center, middle
 
 ---
 
+class: center, middle
+
+## RTL-SDR dongles
+
+There are lots of RTL-SDR dongles. Get one with a TCXO.
+
+[![NooElec "blue" TCXO dongle](nooelec_blue.jpg)](http://www.amazon.com/dp/B00VZ1AWQA)
+[![RTL-SDR Blog 1PPM TCXO dongle](rtl-sdr_blog_dongle.jpg)](http://www.amazon.com/dp/B0129EBDS2)
+
+---
+
 # Why?
 
 Same reason we use software for other things: software is more flexible than hardware.
 
 Military, telecommunications infrastructure use SDR for reconfigurability.
+
+For hobbyists, flexibility == hackability.
 
 ---
 class: center, middle
@@ -163,6 +189,50 @@ Demos:
 
 ---
 
+class: center, middle
+
+# Some things you can do if you have fancier hardware
+
+---
+
+## Reboot a space probe
+
+NASA, with the help of some "citizen scientists" (SDR experts), attempted to establish contact with space probe ISEE-3 17 years after it had been deactivated.
+Within 2 months, they had established contact and started getting telemetry.
+
+.center[<iframe width="640" height="320" src="https://www.youtube.com/embed/BKIJp_9--kA" frameborder="0" allowfullscreen></iframe>]
+
+---
+
+## Run a cell phone tower
+
+You can run a GSM tower if you have a radio with >56MHz of bandwidth and simultaneous transmit/receive capability (e.g. USRP B200).
+This can be used to MITM phone calls, SMSes, data.
+
+.center[<iframe width="640" height="320" src="https://www.youtube.com/embed/xKihq1fClQg" frameborder="0" allowfullscreen></iframe>]
+
+---
+
+## Super-easy replay attacks
+
+With a transmit-capable SRP, you can simply capture radio samples.
+Some low-security devices are susceptible to replay attacks:
+
+ - Fixed code garage doors
+ - RC power outlets
+
+---
+
+## Spy on people using sat phones
+
+Iridium phones use a constellation of satellites, each of which serves a fairly wide region.
+The protocol is also fairly insecure.
+Some phone calls are encrypted, but some are not.
+
+.center[<iframe width="640" height="320" src="https://www.youtube.com/embed/xCf5JFpOkDs" frameborder="0" allowfullscreen></iframe>]
+
+---
+
 ## Legality (reception)
 
 **I am not a lawyer.**
@@ -184,7 +254,7 @@ Some things that are okay:
 - Amateur radio / CB / GMRS
 - Marine or aeronautical communication systems
 
-If you can buy a device that receives it, it's probably okay to receive.
+If you can legally buy a device that receives it, it's probably okay to receive.
 
 ---
 
@@ -202,112 +272,122 @@ This even applies to "license-free" bands like ISM, CB, MURS, FRS
 The easiest license to get is an Amateur Radio license
 &mdash; a few dollars and a test, and you get a bunch of different frequencies.
 
-Amateur bands overlap many common ISM bands.
+Amateur bands overlap many common ISM bands, including 433 MHz, 915 MHz, 2.4 GHz.
 
 ---
 
-- Radio basics
-   - electromagnetic waves
-   - define terms:
-      - amplitude
-      - frequency
-      - phase
-   - basic modulations:
-    - Analog modulations (continuous values)
-      - frequency modulation
-      - amplitude modulation
-   - Relationship between trigonometric and complex exponential
-   - Fourier transform
-    - Define: takes infinitely repeating, continuous time signal, breaks it down into frequency components
-    - Examples: sine wave, square wave, triangle wave
-      - demonstrate how square wave can be constructed of many sine waves
-    - Reversible: inverse fourier transform
-    - DFT: FT can be done in discrete time, on time-limited sections
-      - spectrum analyzers (image: periodogram)
-      - waterfall chart / spectrogram (image: spectrogram, inspectrum, baudline)
+# What do the samples coming from SDR hardware look like?
+
+Like squiggly and/or fuzzy lines.
+
+.fullwidth[ ![FM signal on time domain](./fm_waves_time_domain.png) ]
 
 ---
 
-   - Let's look at our modulations in the frequency domain
-    - FM
-      - oh hey it's a wavy line
-      - kinda looks like our audio.
-      - pretty much what you'd expect.
-      - let's zoom out (take longer FFTs) and explore relationship of audio bandwidth to radio bandwidth
-    - AM
-      - show spectrogram of AM signal
-      - what's going on with those side bands?
-        - show math that explains those, using complex exponentials (TODO: math)
+## Why are there two lines from one antenna?
 
-<!--
-    - SSB: a modification of AM
-      - In AM, the carrier contains no/little information
-      - Also, the upper and lower side bands
-      - we're wasting >half of our power on redundant frequencies
-      - Let's just go ahead and cut these out using a high pass filter.
--->
-   - Heterodyne / frequency shifting
-    - Multiplying two signals produces side bands at the sum and difference of the two frequencies
-    - What if we took an RF signal (from an antenna, perhaps), amplitude modulated it with some nearby frequency?
-    - We'd end up with the original signal, frequency shifted down.
-    - If you shift all the way down to zero, you can demodulate SSB
-    - However, there's a problem: any signal just below your local oscillator frequency also gets shifted down.
-    - The problem is that we can't distinguish negative frequencies from positive frequencies. How do we do that?
+.float-right[![Constellation plot of FM radio signal](./fm_waves_constellation.png)]
+
+SDR hardware gives us "in-phase" and "quadrature" components of the signal, or "I" and "Q".
+We treat these as complex numbers, which gives us some notational advantages:
+
+
+ - Negative frequencies
+ - Shift frequencies by multiplying by a complex exponential.
+ - Per-sample amplitude
+ - Inter-sample frequency
+
 
 ---
 
-# Software Radio Peripheral internals
+# Frequency domain
 
-- Tuner (Local oscillator, mixer)
-- ADC
+We can also send samples through Fast Fourier Transform and plot the output.
+This tells us how much energy exists at different frequencies.
 
----
-
-## What do the samples look like?
+.fullwidth[![FM signal on frequency domain](./fm_waves_freq_domain.png)]
 
 ---
 
-# Let's do some SDR already!
+## Waterfall charts
+
+Same math as before (FFT), but shows frequency content over time
+
+.fullwidth[![FM signal on frequency domain](./fm_waves_waterfall.png)]
+
+(sorry, colorblind folks)
 
 ---
 
 # GNU Radio
 
-(Originally started to try and get the FCC to not mandate the "broadcast flag" in ATSC)[1]
+[Originally started to demonstrate to the FCC how futile it is to have a "broadcast flag" in ATSC.](http://apps.fcc.gov/ecfs/document/view;jsessionid=0Kf2SPvH5VyLmfGmnnLfVhDdYG7Bn5GrQQ2RpynjpS1phMgl7zYp!1357496456!-1864380355?id=6513395349)
 
-[1] http://apps.fcc.gov/ecfs/document/view;jsessionid=0Kf2SPvH5VyLmfGmnnLfVhDdYG7Bn5GrQQ2RpynjpS1phMgl7zYp!1357496456!-1864380355?id=6513395349
+Installable via homebrew/macports, most Linux package managers.
+Windows users should get the [PothosSDR bundle](https://github.com/pothosware/PothosSDR/wiki/Tutorial#download-and-install)
+
+Python glue, C++ signal processing.
+
+Can be scripted in python, or you can use `gnuradio-companion` to point-and-click boxes.
 
 ---
 
-<div id="placeholder" style="width: 100px; height: 100px"></div>
+class: center, middle
 
-<script language="javascript" type="text/javascript">
-$(function() {
+# Let's build a software-defined FM radio!
 
-    var d1 = [];
-    for (var i = 0; i < 14; i += 0.5) {
-      d1.push([i, Math.sin(i)]);
-    }
+???
 
-    var d2 = [[0, 3], [4, 8], [8, 5], [9, 13]];
+- open GRC
+- new flow graph
+- Set `samp_rate` to `2e6`
+- add osmocom source
+  - Set frequency to 107.7e6
+  - enable AGC
+- Add waterfall chart for visibility.
+- Run flowgraph.
+- Add Quadrature Demod -> QT GUI Time Sink
+   - Fix errors:
+      - create variable `fsk_deviation_hz`
+      - Change input type of time sink to float
+- Run flowgraph
+- Enable autoscaling on time sink, run flowgraph again.
+- Add audio sink with sample rate `int(samp_rate)`.
+   - Unmute
+   - Kinda sounds right, but also sounds really bad.
+   - Add low pass filter, cutoff 100e3 / transition 25e3, run again, should sound better.
+- Set decimation:
+   - Add variable `decimation`, value 10
+   - Add variable down_rate, value `samp_rate / decimation`
+   - Set decimation of low pass filter
+   - adjust bandwidth, etc. of everything downstream of LPF
+- Why is frequency sink symmetric?
+   - Quadrature demod gives us a real number.
 
-    // A null signifies separate line segments
+---
 
-    var d3 = [[0, 12], [7, 12], null, [7, 2.5], [12, 2.5]];
+### Other useful software:
 
-    $.plot("#placeholder", [ d1, d2, d3 ]);
+- [Inspectrum](https://github.com/miek/inspectrum)
+- [Baudline](http://www.baudline.com/)
+- [GQRX](http://gqrx.dk/)
+- [SDRSharp](http://airspy.com/download/)
+- [Pothos](https://github.com/pothosware/pothos/wiki)
 
-    // Add the Flot version string to the footer
+### Extra resources
 
-    // $("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
-});
-</script>
+- [rtl-sdr.com](http://www.rtl-sdr.com)
+- [r/RTLSDR](https://www.reddit.com/r/RTLSDR/)
+- [Software Defined Radio with HackRF](http://greatscottgadgets.com/sdr/)
+- [Understanding Digital Signal Processing (3rd Ed.)](http://www.amazon.com/Understanding-Digital-Signal-Processing-3rd/dp/0137027419)
+
+
 
     </textarea>
     <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
     </script>
     <script>
-      var slideshow = remark.create();
+      var slideshow = remark.create({ratio: '16:9'});
     </script>
   </body>
 </html>
