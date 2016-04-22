@@ -36,9 +36,9 @@
         text-decoration: inherit;
       }
 
-      .remark-slide-content th {
-         padding-left: 0.3em;
-         padding-right: 0.3em;
+      .remark-slide-content th, .remark-slide-content td {
+         padding-left: 0.5em;
+         padding-right: 0.5em;
       }
       table {
         border-collapse: collapse;
@@ -66,7 +66,7 @@
       }
 
       .hardware table {
-         font-size: 25px;
+         font-size: 35px;
       }
 
       .fullwidth img {
@@ -76,6 +76,10 @@
       .float-right {
          float: right;
          width: 50%;
+      }
+
+      .scrunch h3 {
+        margin: 0.5em 0em 0.5em 0em;
       }
     </style>
 <!--     <script language="javascript" type="text/javascript" src="http://www.flotcharts.org/flot/jquery.js"></script>
@@ -96,10 +100,9 @@ class: center, middle
 # Agenda
 
 1. What is SDR?
-1. Some quick demos
-1. Radio basics
-1. How does SDR work?
-1. How to get started with SDR
+1. What can you use it for?
+1. What kind of data do we get with an SDR?
+1. Let's make a radio
 
 ---
 
@@ -120,7 +123,7 @@ class: center, middle
 | RTL-SDR  | .best[&lt;$30] |    2.6 M    |  24 MHz           | 1766 MHz     |                 |
 | SDRPlay  | $150           |     10 M    | .best[100 kHz]    | 2 GHz        |                 |
 | Airspy   | $200           |     10 M    | 24 kHz            | 1.8 GHz      |                 |
-| HackRF   | $300           |     20 M    | .best[&lt; 1 MHz] | .best[6 GHz] | .best[&#10004;] |
+| HackRF   | $300           |     20 M    | .best[&lt; 1 MHz] | .best[6 GHz] |    &frac12;     |
 | BladeRF  | $420           |     40 M    | 300 MHz           | 3.8 GHz      | .best[&#10004;] |
 | B200     | $686           | .best[61 M] | 70 MHz            | .best[6 GHz] | .best[&#10004;] |
 ]
@@ -253,7 +256,7 @@ Some things that are okay:
 - Amateur radio / CB / GMRS
 - Marine or aeronautical communication systems
 
-If you can legally buy a device that receives it, it's probably okay to receive.
+If you can legally buy a device that receives it, and you aren't invading anyone's privacy, it's probably okay to receive.
 
 ---
 
@@ -365,6 +368,8 @@ class: center, middle
 
 ---
 
+class: scrunch
+
 ### Other useful software:
 
 - [Inspectrum](https://github.com/miek/inspectrum)
@@ -372,6 +377,7 @@ class: center, middle
 - [GQRX](http://gqrx.dk/)
 - [SDRSharp](http://airspy.com/download/)
 - [Pothos](https://github.com/pothosware/pothos/wiki)
+- [dholm/homebrew-sdr](https://github.com/dholm/homebrew-sdr)
 
 ### Extra resources
 
